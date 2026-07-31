@@ -25,7 +25,10 @@ a sandbox file). No weight or system-prompt access.
   specialists) → `chain` (handoff) → `mesh`. Roles fixed at 4 specialists;
   memory private.
 - **Held fixed:** payload, injection target, model, task, step budget.
-- **Scenario:** BrowserART first (real benchmark), one capable model.
+- **Scenario:** `code_ipi` (Orbit's dedicated indirect-injection coding
+  scenario) as primary; **BrowserART as the second-scenario replication check**
+  (does the effect hold on a different task/payload — see course-changers).
+  See Deviations below.
 - **DVs — stage-wise:** exposed → *attempted* (complied) → *completed* (attack
   success) → *detected*. Attack success is kept separate from attempted and from
   detection — an attack can fail because an agent caught it (a defensive win) or
@@ -64,6 +67,17 @@ hypothesis-generating** — not evidence for these claims.
   do not generalize.
 - LLM judge disagrees with hand-labels on >10% of a spot-checked sample → fix
   the judge before trusting any detection rate.
+
+## Deviations from initial plan (disclosed)
+
+- **2026-07-31 — primary scenario changed from BrowserART to `code_ipi`.**
+  Rationale: `code_ipi` is Orbit's purpose-built indirect-injection scenario and
+  ships standalone/star/mesh topology presets plus an in-sandbox injection
+  scorer, so it tests the same hypotheses with less bespoke config and a
+  scenario designed for this exact threat vector. BrowserART is retained as the
+  cross-scenario replication check, which directly serves the pre-registered
+  "payload/scenario artifact" course-changer. Hypotheses H1–H4 are unchanged.
+  Made before any confirmatory run.
 
 ## Exploratory prototype (already run — NOT confirmatory)
 
