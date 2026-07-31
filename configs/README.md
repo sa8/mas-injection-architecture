@@ -12,6 +12,21 @@ uv run orbit run ../mas-injection-architecture/configs/<config>.yaml -m <model>
 Use a free local model for development (`-m ollama/qwen2:7b`) and a capable
 model for the real runs. See each config's header for specifics.
 
+## Topology coverage (code_ipi)
+
+Orbit ships presets for standalone/star/mesh; **chain is not a first-class
+preset** but is constructible via `direct_run` edges (see `code_ipi_chain.yaml`).
+
+| Arm | Config |
+|---|---|
+| standalone | Orbit preset `code_ipi/presets/single_agent.yaml` |
+| star (isolated specialists) | Orbit preset `code_ipi/presets/star_specialists.yaml` |
+| chain (reader→fixer→tester) | `code_ipi_chain.yaml` (this repo) |
+| mesh | Orbit preset `code_ipi/presets/mesh_delegation.yaml` (or `mesh_round_robin.yaml`) |
+
+## Configs in this repo
+
 | Config | Purpose |
 |---|---|
-| `smoke_indirect_star.yaml` | No-sandbox plumbing smoke — confirms a composed indirect-injection × star-topology experiment executes and produces judge output. Not a result. |
+| `code_ipi_chain.yaml` | The chain arm Orbit lacks a preset for — linear `direct_run` pipeline. Verify ordering on a capable model before trusting. |
+| `smoke_indirect_star.yaml` | No-sandbox plumbing smoke (early spike). Not a result. |
