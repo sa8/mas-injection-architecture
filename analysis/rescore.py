@@ -76,8 +76,28 @@ def _orbit(sample: dict) -> dict:
     return v if isinstance(v, dict) else {}
 
 
+def _code_ipi_meta(sample: dict) -> dict:
+    """Resolve the sample's ``code_ipi_*`` metadata.
+
+    build_sample() serializes the config through MASMetadata, so these keys sit
+    under metadata["experiment"]["metadata"], not at the top level. Probe flat
+    first, then nested (same shape as the scorer-side fix in ORBIT_PATCH.md).
+    Reading only the flat location silently yields category='' -> attack=0 for
+    every sample, i.e. a fake 0% attack rate.
+    """
+    metadata = sample.get("metadata") or {}
+    if any(k.startswith("code_ipi_") for k in metadata):
+        return metadata
+    exp = metadata.get("experiment")
+    if isinstance(exp, dict):
+        inner = exp.get("metadata")
+        if isinstance(inner, dict):
+            return inner
+    return metadata
+
+
 def _meta(sample: dict, key: str, default=None):
-    return sample.get("metadata", {}).get(key, default)
+    return _code_ipi_meta(sample).get(key, default)
 
 
 def attack_success(sample: dict) -> tuple[bool, str]:
