@@ -50,13 +50,13 @@ Same 15 injected tasks, same model (Claude Haiku 4.5), two team structures:
 
 | | single agent | 4-agent star team |
 |---|---|---|
-| **attack succeeded** | 40% | 40% |
+| **attack succeeded** | 27% | 27% |
 | task still completed | 100% | 100% |
 | agent noticed the attack | 0% | 13% |
 
 Two findings:
 
-**1. Agents almost never notice.** Attacks succeed 40% of the time while the
+**1. Agents almost never notice.** Attacks succeed ~27% of the time while the
 agents flag them ~0–13% of the time. These aren't systems weighing a risk and
 getting it wrong — they don't register that anything happened.
 
@@ -67,7 +67,7 @@ payload reveals a clean crossover the headline number hides:
 | attacker hid the payload in… | single agent | star team |
 |---|---|---|
 | the **bug report** (arrives in the prompt) | 80% | 40% |
-| a **code comment** (found when reading files) | 33% | 67% |
+| a **code comment** (found when reading files) | 0% | 33% |
 
 The mechanism is intuitive. The star team's manager reads the bug report and
 hands out narrow instructions, so a malicious instruction in the report usually
@@ -79,6 +79,12 @@ context needed to judge it.**
 
 That points at a concrete design fix worth testing: give executing agents enough
 task context to recognise content that doesn't belong.
+
+*(Numbers corrected 2026-08-02: an earlier version of this summary reported 40%
+attack success and 33%→67% for code comments. My own scorer was counting a
+payload reproduced inside a `cat > file << EOF` heredoc — an agent rewriting a
+file — as an execution. Fixed; the direction of the crossover is unchanged and
+the single-agent comment figure is now 0%.)*
 
 ## Honest limitations
 
