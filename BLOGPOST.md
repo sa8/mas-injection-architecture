@@ -80,7 +80,7 @@ spotting it and deciding against it. They just don't see it.
 
 The second is that the identical headline number is hiding something. If I split
 the results by where the attacker hid the malicious instruction, the two setups
-come apart. The attack success rate in each setting are as follows:
+come apart. The attack success rate in each setting is as follows:
 
 | injection hidden in | single agent | 4-agent team |
 |---|---|---|
@@ -99,11 +99,14 @@ who opens the file was only told "read this file". It doesn't know what the actu
 task is, so an injected comment doesn't look out of place. It looks like part of
 the job.
 
+**The agent handling the untrusted content is the one without the context to
+judge it.**
+
 ## A contribution to the tooling
 
-Orbit was released a few weeks ago in beta. Using it in the context of prompt
-injections, that the authors had not yet tested for in their paper, surfaced two
-bugs that I shared with the team.
+Orbit was released a few weeks ago in beta. Using it for prompt injection, which
+the authors hadn't tested in their paper, surfaced two bugs that I shared with
+the team.
 
 [PR #4](https://github.com/wlanderson0/orbit/pull/4) — the scorer was reading its
 configuration from the wrong place. Every attack initially came back blocked and
