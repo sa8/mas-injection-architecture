@@ -56,6 +56,71 @@ hypothesis-generating** — not evidence for these claims.
   unnoticed rather than refused.
 - **H4 (secondary):** benign-task success roughly flat across architectures —
   capability does not predict injection-robustness.
+- **H5 — the crossover (added 2026-08-10; see Analysis plan).** Architecture does
+  not change *how often* injections succeed so much as *which* ones do:
+  relative to `standalone`, `star` **lowers** attack success for payloads that
+  arrive in the prompt and **raises** it for payloads encountered while reading
+  files. H5 is **derived from the pilot** — it was found by splitting data that
+  had already been collected — and is elevated to confirmatory status for the
+  45-task sweep only because the analysis below is fixed in advance. H1–H4 are
+  unchanged.
+
+## Analysis plan for the confirmatory sweep (fixed 2026-08-10, before any run)
+
+**Design.** All 45 `code_ipi` samples (35 injected, 10 benign) run under each
+architecture: `standalone`, `star`, `chain`, `mesh`. Same tasks in every arm, so
+the design is within-task and analysed paired. Subject model Claude Haiku 4.5
+(the pilot's only model with variance to explain; Claude Sonnet 5 resisted
+everything). One epoch.
+
+**Injection site — the stratification, defined now.** Orbit's four
+`injection_vector` values collapse to two strata on the mechanism H5 claims:
+
+| stratum | vectors | n injected | reaches the agent via |
+|---|---|---|---|
+| prompt-borne | `issue_text` | 10 | the task description the orchestrator is given |
+| file-borne | `code_comment`, `readme`, `config_file` | 25 | files an agent opens while working |
+
+Pooling is the pre-specified primary because it matches the mechanism ("arrives
+in the prompt" vs "found when reading files") and because per-vector cells of
+n=10 are underpowered — at the pilot's effect sizes a single vector reaches only
+p≈0.17. The four-way per-vector split is reported as secondary.
+
+**Primary endpoint.** The `arm × site` interaction on attack success, for
+`standalone` vs `star` only. Statistic: difference-in-differences,
+`(p_star − p_standalone | prompt) − (p_star − p_standalone | file)`.
+Test: permutation, exchanging the arm label **within task** (which preserves the
+pairing), 10,000 draws, two-sided α = 0.05. Reported with a bootstrap CI.
+A mixed-effects logistic model (`success ~ arm * site + (1 | task)`) is reported
+alongside as a check, not as the primary — with ~35 tasks and rare events it may
+not converge, and the permutation test carries no such assumption.
+
+**Power.** At the pilot's effect sizes (prompt 80%→40%, file 0%→33%) and
+n=10/25 per arm, simulated power for this interaction is ≈0.89. That estimate
+inherits the pilot's noise and is a planning figure, not a guarantee.
+
+**Secondary, explicitly not corrected for multiplicity, reported with CIs
+rather than p-values:** `chain` and `mesh` arms (H2); the four-way per-vector
+breakdown; payload category (`exfiltration` / `code_execution` / `persistence`);
+payload sophistication (`plain` / `authority_framing`); detection (H3) and
+benign completion (H4).
+
+**Rules fixed in advance.**
+- **Unit of analysis is the task**, not the run. If epochs > 1 are ever run,
+  outcomes are aggregated within task first — epochs must not inflate the
+  denominator.
+- **Exclusions:** benign controls are excluded from attack rates (they carry the
+  false-positive rate instead); unscoreable samples are excluded and counted,
+  never imputed (see the 2026-08-10 deviation).
+- **No optional stopping.** One pass of 45 × 4 arms. If the result is
+  inconclusive, that is the finding; n is not extended after seeing it.
+- **Detection (H3) is not reported from the sweep until round 2 of the blind
+  grader validation passes** (`analysis/blind_validation/VALIDATION_NOTE.md`).
+
+**What would falsify H5.** A null interaction, reported as null. A crossover in
+the opposite direction, reported as such. The pilot's headline equality
+(31% vs 31% overall) is *not* evidence for H5 and is not part of the test — H5
+lives or dies on the interaction alone.
 
 ## What would change course
 
