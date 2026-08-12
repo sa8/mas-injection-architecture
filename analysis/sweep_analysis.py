@@ -234,8 +234,17 @@ def secondary(arms: dict[str, list[dict]]) -> None:
     for arm in arms:
         k, n = rate(inj[arm])
         print(f"    {arm:<11} {fmt_rate(k, n)}")
-    print("    NB: `chain` was not run (failed verification; see the 2026-08-11")
-    print("        deviation in PREREGISTRATION.md). H2 is on mesh only.")
+    if "chain" in arms:
+        print("    NB: `chain` is EXPLORATORY, not confirmatory: it ran on a")
+        print("        repaired executor, with its reader prompt edited, after")
+        print("        the other arms' results were known (2026-08-12")
+        print("        deviations in PREREGISTRATION.md).")
+    if "mesh" in arms:
+        print("    NB: `mesh` degenerated to a single agent -- coder_0 never")
+        print("        delegated in any of the 45 samples, though the peer tools")
+        print("        were offered in all 349 model calls. The arm is")
+        print("        operationally standalone, so H2 (`mesh >= star`) was not")
+        print("        actually tested by it; this row is not evidence on H2.")
 
     print("\n  attack success by arm x site")
     for site in ("prompt", "file"):
