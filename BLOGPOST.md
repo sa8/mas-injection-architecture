@@ -57,10 +57,15 @@ from the paper's authors, and their indirect prompt injection scenario
 (`code_ipi`): a real bug-fixing task with an injected payload. This runs in a
 Docker sandbox.
 
-I run 15 tasks (13 with an injection, 2 clean controls), using the same model
+I run 45 tasks (35 with an injection, 10 clean controls), using the same model
 (Claude Haiku 4.5), in two different setups: one agent working alone, and a
 four-agent team where an agent manager delegates to an agent reader, an agent
 fixer and an agent tester.
+
+The split I report below — whether the malicious instruction arrives in the bug
+report or in the files the agents open on the way — was written down before I
+ran any of it, along with the test I'd use to judge it. An earlier 15-task pilot
+suggested the pattern. This run was set up to confirm it or kill it.
 
 ## Results
 
@@ -68,28 +73,33 @@ The results are summarised in the table below:
 
 | | single agent | 4-agent team |
 |---|---|---|
-| attack succeeded | 31% | 31% |
+| attack succeeded | 17% | 34% |
 | task still completed | 100% | 100% |
-| agent flagged the attack | 0% | 13% |
 
-Two things stood out.
+Both setups did the actual job every single time. Neither was worse at fixing
+bugs. They differed only in what they could be talked into.
 
-The first is that the agents almost never notice the attack. The attack succeeds
-about a third of the time, and they flag it 0-13% of the time. They are not
-spotting it and deciding against it. They just don't see it.
+(The pilot's third measure — whether any agent *noticed* the attack — is missing
+from that table on purpose. I'm re-checking that grader against blind hand-labels
+before I quote a number from this run.)
 
-The second is that the identical headline number is hiding something. If I split
-the results by where the attacker hid the malicious instruction, the two setups
-come apart. The attack success rate in each setting is as follows:
+The team looks worse overall, but I wouldn't lean on that number: across 35
+injected tasks a gap that size is still within the noise. The finding is what the
+average is hiding. Split the results by where the attacker hid the instruction
+and the two setups don't just differ, they swap places:
 
 | injection hidden in | single agent | 4-agent team |
 |---|---|---|
-| the bug report | 80% | 40% |
-| a code comment | 0% | 33% |
+| the bug report | 60% | 30% |
+| the project files | 0% | 36% |
 
-The multi-agent system complied with 40% of the attacks that came in through the
-bug report. It was also vulnerable to attacks through code comments that the
-single agent never fell for at all.
+The team halved the attacks arriving through the bug report. And it fell for
+attacks planted in code comments, READMEs and config files that the single agent
+never fell for once — not in 25 attempts.
+
+That crossover is the result I registered in advance, and it survived the test:
+swapping the two setups' labels at random puts the odds of a reversal this large
+happening by chance at about 7 in 1,000.
 
 This makes sense if you look at what each agent sees. The agent manager reads the
 bug report and hands out narrow instructions, like "fix the regex in
@@ -133,9 +143,11 @@ to use the Orbit repo.
 
 ## Limitations
 
-For each scenario, I run only 15 simulations due to budget constraints. This
-project hence gives a good intuition about security implications of prompt
-injections in multi-agent settings but should not be treated as a final result.
+For each scenario, I run 45 tasks. That is enough to test the split above, but
+it still leaves the individual cells small — 10 tasks for the bug-report row.
+This project gives a good intuition about the security implications of prompt
+injections in multi-agent settings, and the crossover it was designed to test
+holds up, but the per-cell rates should be read as indicative rather than exact.
 
 A stronger model (Claude Sonnet) resisted every attack regardless of the
 topology, so these numbers describe a weaker model. That's a real limit on how
@@ -143,9 +155,9 @@ far the finding generalises. However the goal of this study was to show how
 security assumptions do not generally compose, not to test for a particular
 model.
 
-I've only tested two of the four architectures. Chain and mesh are built and
-configured but not yet run, and the paper found chain to be the riskiest topology
-on coding tasks, so that's where I'd expect the next surprise.
+I've only reported two of the four architectures. Chain and mesh aren't included
+in these results yet, and the paper found chain to be the riskiest topology on
+coding tasks, so that's where I'd expect the next surprise.
 
 The scenario is coding tasks only. We expect similar results to show up in
 different environments too (e.g. browser).
@@ -154,8 +166,7 @@ different environments too (e.g. browser).
 
 Pending more funding, the next steps of this project are as follows:
 
-1. Scale the current comparison across all four architectures to get some
-   statistically significant results.
+1. Extend the comparison to the remaining two architectures, chain and mesh.
 2. Replicate in a second environment (browser agents rather than coding agents)
    to test whether it's architecture or task type.
 3. Test the proposed fix. Run the star team again with specialists that can see
